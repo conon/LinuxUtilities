@@ -7,7 +7,7 @@
 
 #include "pathr.h"
 
-#define VERSION "1.00"
+#define VERSION "0.01"
 
 
 static struct option long_options[] = 
