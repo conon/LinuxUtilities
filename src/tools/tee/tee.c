@@ -115,7 +115,7 @@ main(int argc, char *argv[])
 		}
 		buf[numRead] = '\0';
 		
-		// write to files if they requested
+		// write to files if requested
 		for(i = 0; fds[i] != -1; i++) {
 			numWritten = write(fds[i], buf, numRead);
 			if (numWritten == -1) {
