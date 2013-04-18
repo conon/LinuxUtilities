@@ -1,0 +1,19 @@
+A set of general linux utilities written in C for fun.
+I will be adding more tools periodically without any particular order.
+They have been tested only on Linux.
+
+'make compile' will compile them
+
+'make install' install them in the new created LinuxUtilities directory.
+
+'make clean' will clean up everything including LinuxUtilities directory.
+
+
+compile:
+	make
+	
+install:
+	make install
+	
+clean:
+	make clean

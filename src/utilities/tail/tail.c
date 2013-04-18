@@ -16,7 +16,7 @@ static struct option long_options[] =
 static void
 usage()
 {
-	fputs("Usage: chown [OPTION] OWNER[:[GROUP]] FILE\n\n"
+	fputs("Usage: tail  [OPTION] [FILE]\n\n"
 	"OPTIONS:\n"
 	"  -v, --verbose      print a message for every created directory\n"
 	"    --help           print this message and exit\n"
