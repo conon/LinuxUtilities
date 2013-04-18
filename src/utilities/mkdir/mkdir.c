@@ -52,9 +52,9 @@ main(int argc, char *argv[])
     int c;
     int option_index = 0;
     int status;
+    int temp_val;
     bool fparent = false;
     bool fverbose = false;
-    int temp_val;
     char *temp_path;
     char *s_mode = NULL;
     mode_t o_mode;
@@ -137,6 +137,10 @@ main(int argc, char *argv[])
 			temp_val = optind++;
 			
 			status = mkdir(argv[temp_val], o_mode);
+			if (status == -1 && fverbose) {
+				printf("mkdir: directory exists '%s'\n", argv[temp_val]);
+				continue;
+			}
 			if (status == -1) {
 				perror("mkdir: ");
 				exit(EXIT_FAILURE);
