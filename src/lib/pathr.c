@@ -1,12 +1,12 @@
-#include <string.h>
+#include <string.h> 
 #include <stdlib.h>
-
-#include <string.h>
 #include <stdbool.h>
+
+#include <unistd.h>
 
 #include "pathr.h"
 
-#define BUF 4096
+#define BUF _PC_PATH_MAX
 
 static char *tpath;
 static bool flag = false;

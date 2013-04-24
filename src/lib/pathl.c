@@ -1,9 +1,11 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <unistd.h>
+
 #include "pathl.h"
 
-#define	BUF 4096
+#define	BUF _PC_PATH_MAX
 
 static char *pch;
 
