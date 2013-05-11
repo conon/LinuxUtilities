@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 #include <getopt.h>
 #include <unistd.h>
@@ -8,7 +7,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#define VERSION "0.01"
+#define VERSION "0.0.1"
+#define POS -10
 
 static struct option long_options[] = 
 {
@@ -48,6 +48,7 @@ main(int argc, char *argv[])
 	int status;
     int option_index = 0;
     int fds[_SC_OPEN_MAX];
+    off_t offset;
 	
 	while( (c = getopt_long(argc, argv, "a", long_options, &option_index)) != -1) {
 
@@ -78,20 +79,32 @@ main(int argc, char *argv[])
 	
 	for(i = 0; optind != argc; optind++, i++) {
 		
-		fds[i] = open(argv[optind], O_RDWR | O_CREAT | O_EXCL, S_IRWXU | S_IRWXG 
-		| S_IRWXO);
+		fds[i] = open(argv[optind], O_RDWR | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
 		if (fds[i] == -1) {
 			perror("open ");
 			exit(EXIT_FAILURE);
 		}
 		
+		/*first check if file is empty or has less than 10 bytes, if it has procceed,
+		 *else minus 10 the offset and then procceed*/
+		
+		offset = lseek(fds[i], 0, SEEK_END);
+		if (offset == -1) {
+			perror("lseek ");
+			exit(EXIT_FAILURE);
+		}
+		if (offset <= 10) {
+			/*evaluate*/
+		} else {
+		
+			offset = lseek(fds[i], POS, SEEK_END);
+			if (offset == -1) {
+				perror("lseek ");
+				exit(EXIT_FAILURE);
+			}
+		}
 	}
 	
-	for(i = 0; optind != argc; optind++, i++) {
-		
-		
-		
-	}
 	
 	return 0;
 }
