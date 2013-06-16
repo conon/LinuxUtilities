@@ -31,11 +31,11 @@ usage()
 {
 	fputs("Usage: tail  [OPTION] [FILE]\n\n"
 	"OPTIONS:\n"
-	"  -v, --verbose		print a message for every created directory\n"
-	"  -c  --bytes=[number of bytes]      print the last bytes. Use c [number of bytes]"
-	"  -n  --lines=[number of lines]	  print the last lines, Use n [number of bytes]"
-	"    --help           print this message and exit\n"
-	"    --version        print version and exit\n", stdout);
+	"  -v, --verbose                      print a message for every creat directory\n"
+	"  -c  --bytes=[number of bytes]      print the last bytes. Use c [number of bytes]\n"
+	"  -n  --lines=[number of lines]      print the last lines, Use n [number of bytes]\n"
+	"    --help                           print this message and exit\n"
+	"    --version                        print version and exit\n", stdout);
 
 	exit(EXIT_SUCCESS);
 }
@@ -53,11 +53,11 @@ print_version()
 static void
 read_bytes(int fd, int bytes_num)
 {
-    ssize_t bytes_read, bytes_written;
+	ssize_t bytes_read, bytes_written;
 	off_t offset;
-	int neg_num, size;
-	size_t len;
-	char *buf, *buf_temp, *temp;
+	long int neg_num, size;
+	char *buf, *buf_temp;
+	char *temp = NULL;
 	
 	if (fd == STDIN_FILENO) {
 		
@@ -107,9 +107,7 @@ read_bytes(int fd, int bytes_num)
 		
 		temp = buf;
 		
-		len = strlen(buf) - bytes_num; /* point to the last bytes */
-		
-		buf += len;
+		buf += strlen(buf) - bytes_num; /* point to the last bytes */
 	
 	} else {
 		
@@ -272,10 +270,10 @@ main(int argc, char *argv[])
 {
 	
 	int c, i;
-    int option_index = 0;
     int fds[_SC_OPEN_MAX];
+    int bytes_num = 0;
     int bytes_bool = FALSE;
-    int bytes_num;
+    int option_index = 0;
     int lines_num = DEFAULT_POS;
     
    
@@ -294,12 +292,20 @@ main(int argc, char *argv[])
 			case 'c':
 				bytes_bool = TRUE;
 				bytes_num = atoi(optarg);
-				// some catchs when converting to int
+				if (bytes_num == 0) {
+					fprintf(stderr, "-c value should be numeric\n");
+					fprintf(stderr, "See tail --help for more info\n");
+					exit(EXIT_FAILURE);
+				}
 				break;
 				
 			case 'n':
 				lines_num = atoi(optarg);
-				// some catchs when converting to int
+				if (lines_num == 0) {
+					fprintf(stderr, "-n value should be numeric\n");
+					fprintf(stderr, "See tail --help for more info\n");
+					exit(EXIT_FAILURE);
+				}
 				break;
 				
 			case '?':

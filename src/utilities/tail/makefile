@@ -2,7 +2,7 @@
 
 OBJS = tail.o
 CC = gcc
-DEBUG = -g3 -Wall
+DEBUG = -O3
 CFLAGS = -c $(DEBUG)
 SPATH = -I../../lib/
 

@@ -5,8 +5,9 @@ RMDIR = ./utilities/rmdir
 CHMOD = ./utilities/chmod
 TEE = ./utilities/tee
 CHOWN = ./utilities/chown
+TAIL = ./utilities/tail
 
-TOOLS = $(MKDIR) $(RMDIR) $(CHMOD) $(TEE) $(CHOWN)
+TOOLS = $(MKDIR) $(RMDIR) $(CHMOD) $(TEE) $(CHOWN) $(TAIL)
 
 .PHONY: all
 all: $(TOOLS)
@@ -34,6 +35,10 @@ $(PRINTENV):
 .PHONY: $(CHOWN)
 $(CHOWN):
 	@$(MAKE) -C $@
+	
+.PHONY: $(TAIL)
+$(TAIL):
+	@$(MAKE) -C $@
 
 .PHONY: install
 install:
@@ -43,6 +48,7 @@ install:
 	mv ./utilities/chmod/chmod LinuxUtilities
 	mv ./utilities/tee/tee LinuxUtilities
 	mv ./utilities/chown/chown LinuxUtilities
+	mv ./utilities/tail/tail LinuxUtilities
 	
 .PHONY: clean
 clean:
@@ -51,4 +57,5 @@ clean:
 	rm -f ./utilities/chmod/*.o
 	rm -f ./utilities/tee/*.o
 	rm -f ./utilities/chown/*.o
+	rm -f ./utilities/tail/*.o
 	rm -rf ./LinuxUtilities
