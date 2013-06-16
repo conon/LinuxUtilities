@@ -31,7 +31,7 @@ usage()
 {
 	fputs("Usage: tail  [OPTION] [FILE]\n\n"
 	"OPTIONS:\n"
-	"  -v, --verbose      print a message for every created directory\n"
+	"  -v, --verbose		print a message for every created directory\n"
 	"  -c  --bytes=[number of bytes]      print the last bytes. Use c [number of bytes]"
 	"  -n  --lines=[number of lines]	  print the last lines, Use n [number of bytes]"
 	"    --help           print this message and exit\n"
@@ -53,38 +53,115 @@ print_version()
 static void
 read_bytes(int fd, int bytes_num)
 {
-    ssize_t bytes_read;
+    ssize_t bytes_read, bytes_written;
 	off_t offset;
-	int neg_num;
-	char buf[20];
+	int neg_num, size;
+	size_t len;
+	char *buf, *buf_temp, *temp;
 	
-	offset = lseek(fd, 0, SEEK_END);
-	neg_num = bytes_num * (-1); //convert it to negative :)
-	
-	if (offset <= bytes_num) {
-		offset = lseek(fd, 0, SEEK_SET);
-		if (offset == -1) {
-			perror("lseek ");
+	if (fd == STDIN_FILENO) {
+		
+		/*temporary storage*/
+		buf_temp = malloc(sizeof(char) * BUFSIZ + sizeof(char));
+		if (buf_temp == NULL) {
+			perror("malloc");
 			exit(EXIT_FAILURE);
 		}
+		
+		/*the buffer for data to be stored*/
+		buf = malloc(sizeof(char) * BUFSIZ + sizeof(char));
+		if (buf == NULL) {
+			perror("malloc");
+			exit(EXIT_FAILURE);
+		}
+		
+		size = BUFSIZ;
+		
+		while(1) {
+			bytes_read = read(fd, buf_temp, size);
+			if (bytes_read == -1) {
+				perror("read");
+				exit(EXIT_FAILURE);
+			}
+			if (bytes_read == 0)
+				break;
+				
+			buf_temp[bytes_read] = '\0';
+			
+			
+			strncat(buf, buf_temp, bytes_read);
+		
+			if (bytes_read == BUFSIZ) { /* reallocate */
+				size += BUFSIZ;
+				temp = realloc(buf, size + sizeof(char));
+				if (temp == NULL) {
+					perror("realloc");
+					free(buf);
+					exit(EXIT_FAILURE);
+				}
+				buf = temp;
+			}
+		}
+		
+		free(buf_temp);
+		
+		temp = buf;
+		
+		len = strlen(buf) - bytes_num; /* point to the last bytes */
+		
+		buf += len;
+	
 	} else {
-		offset = lseek(fd, neg_num, SEEK_END);
-		if (offset == -1) {
-			perror("lseek ");
+		
+		buf = malloc(sizeof(char) * bytes_num);
+		if (buf == NULL) {
+			perror("malloc");
 			exit(EXIT_FAILURE);
 		}
-	}
 	
-	neg_num *= (-1); //convert it to positive
-	bytes_read = read(fd, buf, neg_num);
-	if (bytes_read == -1) {
-		perror("read");
-		exit(EXIT_FAILURE);
+		offset = lseek(fd, 0, SEEK_END);
+		neg_num = bytes_num * (-1); /* convert it to negative */
+	
+		if (offset <= bytes_num) {
+			offset = lseek(fd, 0, SEEK_SET);
+			if (offset == -1) {
+				perror("lseek ");
+				exit(EXIT_FAILURE);
+			}
+		} else {
+			offset = lseek(fd, neg_num, SEEK_END);
+			if (offset == -1) {
+				perror("lseek ");
+				exit(EXIT_FAILURE);
+			}
+		}
+	
+		
+		bytes_read = read(fd, buf, bytes_num);
+		if (bytes_read == -1) {
+			perror("read");
+			exit(EXIT_FAILURE);
+		}
+		
+	
 	}
-	buf[bytes_read] = '\0';
 	
 	close(fd);
-	printf("%s", buf);
+	
+	bytes_written = write(STDOUT_FILENO, buf, bytes_num);
+	if (bytes_written == -1) {
+		perror("write");
+		exit(EXIT_FAILURE);
+	}
+	if (bytes_written < bytes_num) {
+		fprintf(stderr, "Less than requested bytes written\n");
+	}
+	
+	
+	if (fd == STDIN_FILENO)
+		free(temp);
+	else
+		free(buf);
 	
 }
 
@@ -144,6 +221,9 @@ read_lines(int fd, int lines_num)
 				buf = temp;
 			}
 		}
+		
+		free(buf_temp);
+		
 	} else {
 	
 		fseek(pFile, 0 ,SEEK_END);
@@ -165,7 +245,7 @@ read_lines(int fd, int lines_num)
 	for(i = size-1; i >= 0; i--) {
 		if (buf[i] == '\n') {
 			lines++;
-			if (lines == lines_num + 1) { // document +1
+			if (lines == lines_num + 1) { /* search for +1 to get one more '\n' because we need the data after it*/
 				offset = i; /* store current offset */
 				break;
 			}
@@ -175,7 +255,7 @@ read_lines(int fd, int lines_num)
 	if (lines_num > lines)
 		offset = 0;
 	
-	offset++;
+	offset++; /* we do not need the last '\n' only the data after it*/
 	
 	temp = buf;
 	buf = buf + offset;
