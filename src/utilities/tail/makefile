@@ -1,7 +1,7 @@
 #makefile for tail
 
 OBJS = tail.o
-CC = gcc
+CC = cc
 DEBUG = -O3
 CFLAGS = -c $(DEBUG)
 SPATH = -I../../lib/

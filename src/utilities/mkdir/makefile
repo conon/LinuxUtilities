@@ -1,7 +1,7 @@
 #makefile fo mkdir
 
 OBJS = mkdir.o bitsmode.o pathl.o
-CC = gcc
+CC = cc
 DEBUG = -O3
 CFLAGS = -c $(DEBUG)
 SPATH = -I../../lib/
